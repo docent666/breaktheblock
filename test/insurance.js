@@ -37,23 +37,43 @@ contract('Insurance', function(accounts) {
         return insurance.withdraw.sendTransaction({from:account_one});
     }).then(function() {
         var account_one_ending_balance = humanReadableBalance(account_one);
-        assert.approximately(account_one_ending_balance, account_one_starting_balance + amountToVerify, 2, "claim not recorded properly");
-    })
+        assert.approximately(account_one_ending_balance, account_one_starting_balance + amountToVerify, 3, "claim not recorded properly");
+    }).catch((err) => { throw new Error(err) })
   })
 
-//  it("can participate if pool maxed and will allow owner to withdraw", function () {
-//    var insurance;
-//
-//    return Insurance.deployed().then(function(instance) {
-//        insurance = instance;
-//    }).then(function(instance) {
-//        insurance = instance;
-//        return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
-//    }).then(function() {
-//        return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount})
-//    }).then(function() {
-//        return insurance.participate.sendTransaction({from: account_two, value: insureAmount})
-//  })})
+  it('creation: should create an initial balance of 100 for the creator', function () {
+    return Insurance.deployed().then(function(instance) {
+      return instance.balanceOf.call(accounts[0])
+    }).then(function (result) {
+      assert.strictEqual(result.toNumber(), 100)
+    }).catch((err) => { throw new Error(err) })
+  })
+
+  it("can participate if pool maxed and will issue tokens", function () {
+    var insurance;
+
+    var poolSize = Math.pow(10,16)*100;
+    var insureAmount = Math.pow(10,16)*23;
+
+    return Insurance.deployed().then(function(instance) {
+        insurance = instance;
+        return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+    }).then(function() {
+        return insurance.contribute.sendTransaction({from: account_sponsor, value: poolSize +1})
+    }).then(function() {
+        return insurance.participate.sendTransaction(account_two, 4, {from: account_sponsor})
+    }).then(function() {
+        return insurance.balanceOf.call(account_two)
+    }).then(function(result) {
+        assert.strictEqual(result.toNumber(), 4)
+        return insurance.balanceOf.call(account_sponsor)
+    }).then(function(result) {
+        assert.strictEqual(result.toNumber(), 96)
+    }).catch((err) => { throw new Error(err) })
+
+    }
+  )
+
 
    //test init function
    //add checks that the max and ratio are used

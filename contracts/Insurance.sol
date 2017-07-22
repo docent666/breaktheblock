@@ -11,7 +11,6 @@ contract Insurance is StandardToken {
 
 	uint MAXIMUM_POOL_SIZE = 0;
     bool contractFull = false;
-    uint tokensAvailable = 100;
 
 	struct Insured {
 		bool withdrawable;
@@ -55,26 +54,20 @@ contract Insurance is StandardToken {
 		_;
 	}
 
-	//for owner/participant only
 	function contribute() payable owner_only {
         require(!contractFull);
 		poolSize = poolSize + msg.value;
-		if (contributors[msg.sender]!= 0){
-			contributors[msg.sender] = contributors[msg.sender] + msg.value;
-		} else {
-			contributors[msg.sender] = msg.value;
+		contributors[msg.sender] = contributors[msg.sender] + msg.value;
+        if (poolSize >= MAXIMUM_POOL_SIZE) {
+			contractFull = true;
+			//contract is filled, so we can now release participation tokens
+			StandardToken.approve(owner, INITIAL_SUPPLY);
 		}
-        if (poolSize >= MAXIMUM_POOL_SIZE) contractFull = true;
 	}
 
-//for participant only
-//to be replaced with actual token issuance
-	function participate() payable returns (uint tokens) {
+	function participate(address to, uint tokens) payable owner_only {
         require(contractFull);
-        var tokensToIssue = (poolSize-retention) / msg.value;
-        contributors[msg.sender] = contributors[msg.sender] + msg.value;
-        return tokensToIssue;
-//Token(token).transferFrom(msg.sender, this, amount)
+		StandardToken.transferFrom(msg.sender, to, tokens);
 	}
 
 	function insure(uint claimSize) payable {
