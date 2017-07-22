@@ -1,7 +1,17 @@
 pragma solidity ^0.4.2;
 
-contract Insurance {
+import 'zeppelin-solidity/contracts/token/StandardToken.sol';
+
+contract Insurance is StandardToken {
+
+	string public name = "ClaiMeToken";
+	string public symbol = "CMT";
+	uint256 public decimals = 18;
+	uint256 public INITIAL_SUPPLY = 100;
+
 	uint MAXIMUM_POOL_SIZE = 0;
+    bool contractFull = false;
+    uint tokensAvailable = 100;
 
 	struct Insured {
 		bool withdrawable;
@@ -9,6 +19,8 @@ contract Insurance {
 		uint claimSize;
 		bool exists;
 		uint premium;
+        uint policyStartTime;
+        uint policyEndTime;
 	}
 
 	address owner;
@@ -23,6 +35,8 @@ contract Insurance {
 
 	function Insurance() {
 		owner = msg.sender;
+		totalSupply = INITIAL_SUPPLY;
+		balances[msg.sender] = INITIAL_SUPPLY;
 	}
 
 	function init(uint maxPoolSize, uint retentionRatio) owner_only {
@@ -43,21 +57,28 @@ contract Insurance {
 
 	//for owner/participant only
 	function contribute() payable owner_only {
+        require(!contractFull);
 		poolSize = poolSize + msg.value;
 		if (contributors[msg.sender]!= 0){
 			contributors[msg.sender] = contributors[msg.sender] + msg.value;
 		} else {
 			contributors[msg.sender] = msg.value;
 		}
+        if (poolSize >= MAXIMUM_POOL_SIZE) contractFull = true;
 	}
 
 //for participant only
-//	function participate() payable {
-//
-//	}
+//to be replaced with actual token issuance
+	function participate() payable returns (uint tokens) {
+        require(contractFull);
+        var tokensToIssue = (poolSize-retention) / msg.value;
+        contributors[msg.sender] = contributors[msg.sender] + msg.value;
+        return tokensToIssue;
+//Token(token).transferFrom(msg.sender, this, amount)
+	}
 
 	function insure(uint claimSize) payable {
-		var insured = Insured(false, false, claimSize, true, msg.value);
+		var insured = Insured(false, false, claimSize, true, msg.value, now, now);
 		insurances[msg.sender] = insured;
 	}
 

@@ -5,6 +5,7 @@ contract('Insurance', function(accounts) {
    //truffle will by default assign accounts[0] as na owner of the deployed contract
   const account_sponsor = accounts[0];
   const account_one = accounts[1];
+  const account_two = accounts[2];
 
   const amount = Math.pow(10,16)*88;
 
@@ -17,11 +18,14 @@ contract('Insurance', function(accounts) {
 
     var account_one_starting_balance = humanReadableBalance(account_one);
     var insureAmount = Math.pow(10,16)*23;
+    var poolSize = Math.pow(10,16)*100;
     var premium = Math.pow(10,16)*15;
     var amountToVerify = (insureAmount - premium)/ Math.pow(10,16);
 
     return Insurance.deployed().then(function(instance) {
         insurance = instance;
+        return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+    }).then(function() {
         return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount})
     }).then(function() {
         return insurance.insure.sendTransaction(insureAmount, {from:account_one, value: premium});
@@ -37,13 +41,19 @@ contract('Insurance', function(accounts) {
     })
   })
 
-  it("participant can withdraw", function () {
-    var insurance;
-
-    return Insurance.deployed().then(function(instance) {
-        insurance = instance;
-    })
-  })
+//  it("can participate if pool maxed and will allow owner to withdraw", function () {
+//    var insurance;
+//
+//    return Insurance.deployed().then(function(instance) {
+//        insurance = instance;
+//    }).then(function(instance) {
+//        insurance = instance;
+//        return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+//    }).then(function() {
+//        return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount})
+//    }).then(function() {
+//        return insurance.participate.sendTransaction({from: account_two, value: insureAmount})
+//  })})
 
    //test init function
    //add checks that the max and ratio are used
