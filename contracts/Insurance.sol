@@ -10,6 +10,7 @@ contract Insurance is StandardToken {
 	uint256 public constant INITIAL_SUPPLY = 100;
 
 	uint MAXIMUM_POOL_SIZE = 0;
+    //token retention ratio - 20% to remain with the owner (insurance company). currently not used
     uint RETENTION = 0;
     bool contractFull = false;
 
@@ -32,7 +33,7 @@ contract Insurance is StandardToken {
 	uint poolSize = 0;
     uint totalInsured = 0;
     uint premiums = 0;
-	//token retention ratio - 20% to remain with the owner (insurance company)
+
 
 
 	function Insurance() {
@@ -107,5 +108,16 @@ contract Insurance is StandardToken {
 		StandardToken.approve(msg.sender, balanceOf(msg.sender) - 1);
 		//forfeit the tokens to prevent further withdrawals
 		StandardToken.transferFrom(msg.sender, this, balanceOf(msg.sender) -1);
+    }
+
+    function withdrawAsOwner() payable owner_only {
+        require(balances[msg.sender] > 0);
+        var toTransfer = contributors[owner] * balances[msg.sender] / INITIAL_SUPPLY;
+        var premiumsToTransfer = premiums * balances[msg.sender] / INITIAL_SUPPLY;
+        msg.sender.transfer(toTransfer + premiumsToTransfer);
+        contributors[owner] -= toTransfer;
+        premiums -= premiumsToTransfer;
+        //forfeit the tokens to prevent further withdrawals
+        StandardToken.transferFrom(msg.sender, this, balanceOf(msg.sender));
     }
 }

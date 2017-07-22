@@ -147,6 +147,28 @@ contract('Insurance', function(accounts) {
     }
   )
 
+    it("if no other participants, owner is sole participants and can withdraw", function () {
+      var insurance;
+
+      var poolSize = multiplier*1000;
+      var gasConsumption = multiplier*10;
+      var expectedWithdrawal = (gasConsumption)/ multiplier
+      var account_sponsor_starting_balance = humanReadableBalance(account_sponsor);
+
+      return Insurance.new().then(function(instance) {
+          insurance = instance;
+          return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+      }).then(function() {
+          return insurance.contribute.sendTransaction({from: account_sponsor, value: poolSize +1})
+      }).then(function() {
+          return insurance.withdrawAsOwner.sendTransaction({from: account_sponsor})
+      }).then(function(result) {
+          var account_sponsor_ending_balance = humanReadableBalance(account_sponsor);
+          assert.approximately(account_sponsor_ending_balance, account_sponsor_starting_balance - expectedWithdrawal, 2, "not withdrawn expected amount");
+      })
+      }
+    )
+
 //  it("should not allow further withdrawals if already withdrawn", function () {
 //   var insurance;
 //   var account_two_starting_balance = humanReadableBalance(account_two);
