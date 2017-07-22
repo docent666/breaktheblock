@@ -1,13 +1,13 @@
 {
   "name": "truffle-init-webpack",
-  "version": "0.0.2",
-  "description": "Frontend example using truffle v3",
+  "version": "0.0.1",
+  "description": "Break Tne Block hackathon entry",
   "scripts": {
     "lint": "eslint ./",
     "build": "webpack",
     "dev": "webpack-dev-server"
   },
-  "author": "Douglas von Kohorn",
+  "author": "",
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.22.2",
