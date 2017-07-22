@@ -19,7 +19,7 @@ contract('Insurance', function(accounts) {
 //    }).then(function(result) {assert.equal(result, true, "says true");})
 //  });
 
-  it("as a client I want to receive insurance for a premium of x for a claim of y, where y is smaller than the seeding pool", function () {
+  it("when an insurance claim is made on a seeded pool then insured amount can be withdrawn", function () {
     var insurance;
 
     var account_one_starting_balance = humanReadableBalance(account_one);
@@ -29,7 +29,7 @@ contract('Insurance', function(accounts) {
 
     return Insurance.deployed().then(function(instance) {
         insurance = instance;
-        return insurance.contribute.sendTransaction({from: account_sponsor, value: claimValue})
+        return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount})
     }).then(function() {
         return insurance.insure.sendTransaction(insureAmount, {from:account_one, value: premium});
     }).then(function() {
