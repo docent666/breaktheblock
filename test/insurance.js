@@ -2,6 +2,7 @@ var Insurance = artifacts.require("./Insurance.sol");
 
 contract('Insurance', function(accounts) {
 
+   //truffle will by default assign accounts[0] as na owner of the deployed contract
   const account_sponsor = accounts[0];
   const account_one = accounts[1];
 
@@ -10,14 +11,6 @@ contract('Insurance', function(accounts) {
   function humanReadableBalance(account) {
      return Math.floor(web3.eth.getBalance(account).toNumber()/Math.pow(10,16));
   }
-
-
-//  it("should say true", function() {
-//    return Insurance.deployed().then(function(instance) {
-//      instance.sendTransaction({from: account_sponsor, value: amount});
-//      return instance.blah.call()
-//    }).then(function(result) {assert.equal(result, true, "says true");})
-//  });
 
   it("when an insurance claim is made on a seeded pool then insured amount can be withdrawn", function () {
     var insurance;
@@ -44,6 +37,16 @@ contract('Insurance', function(accounts) {
     })
   })
 
+  it("participant can withdraw", function () {
+    var insurance;
+
+    return Insurance.deployed().then(function(instance) {
+        insurance = instance;
+    })
+  })
+
+   //test init function
+   //add checks that the max and ratio are used
   //if not claimable do not allow to withdraw
   //if already claimed do not allow to withdraw
   //should not allow to insure if the premium is not paid
