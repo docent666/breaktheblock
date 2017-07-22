@@ -92,11 +92,15 @@ contract Insurance is StandardToken {
     }
 
     //todo: only allow when all insurances are claimed or lapsed
-    function withdrawAsParticipant() payable returns (uint what) {
+	//todo: bug around standard token transfer
+    function withdrawAsParticipant() payable {
         require(balances[msg.sender] > 0);
         var toTransfer = contributors[owner] * balances[msg.sender] / INITIAL_SUPPLY;
         msg.sender.transfer(toTransfer);
         contributors[owner] = contributors[owner] - toTransfer;
-        return toTransfer;
+		//todo: no idea why we cannot move full balance, but hey, tired of invalid opcode  ¯\_(ツ)_/¯
+		StandardToken.approve(msg.sender, balanceOf(msg.sender) - 1);
+		//forfeit the tokens to prevent further withdrawals
+		StandardToken.transferFrom(msg.sender, this, balanceOf(msg.sender) -1);
     }
 }

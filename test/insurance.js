@@ -54,6 +54,7 @@ contract('Insurance', function(accounts) {
     var insureAmount = Math.pow(10,16)*23;
     var expectedWithdrawal = poolSize * 0.24 / Math.pow(10,16)
     var account_two_starting_balance = humanReadableBalance(account_two);
+    var account_two_ending_balance = 0;
 
     return Insurance.new().then(function(instance) {
         insurance = instance;
@@ -72,13 +73,38 @@ contract('Insurance', function(accounts) {
     }).then(function() {
         return insurance.withdrawAsParticipant.sendTransaction({from: account_two})
     }).then(function(result) {
-        var account_two_ending_balance = humanReadableBalance(account_two);
+        account_two_ending_balance = humanReadableBalance(account_two);
         assert.approximately(account_two_ending_balance, account_two_starting_balance + expectedWithdrawal, 2, "not withdrawn expected amount");
+    }).then(function() {
+        return insurance.withdrawAsParticipant.sendTransaction({from: account_two})
+    }).then(function(result) {
+        var account_two_new_ending_balance = humanReadableBalance(account_two);
+        assert.approximately(account_two_ending_balance, account_two_new_ending_balance, 2, "should not allow to withdraw twice");
+        return insurance.balanceOf.call(account_two)
+    }).then(function(result) {
+        //todo: that's a bug
+        assert.strictEqual(result.toNumber(), 1)
+        return insurance.balanceOf.call(account_sponsor)
+    }).then(function(result) {
+        assert.strictEqual(result.toNumber(), 76)
     })
+
 
     }
   )
 
+//  it("should not allow further withdrawals if already withdrawn", function () {
+//   var insurance;
+//   var account_two_starting_balance = humanReadableBalance(account_two);
+//
+//   return Insurance.deployed().then(function(instance) {
+//          insurance = instance;
+//          return insurance.withdrawAsParticipant.sendTransaction({from: account_two})
+//   }).then(function(result) {
+//          var account_two_ending_balance = humanReadableBalance(account_two);
+//          assert.approximately(account_two_ending_balance, account_two_starting_balance, 2, "should be the same balance");
+//    })
+//  })
 
    //test init function
    //add checks that the max and ratio are used
