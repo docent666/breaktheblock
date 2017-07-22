@@ -66,6 +66,33 @@ contract('Insurance', function(accounts) {
       }).catch((err) => { throw new Error(err) })
     })
 
+    //according to documentation, throw will refund the caller with ether supplied minus the gas used
+    //in this case however the gas used appears to be more than the provided premium in other tests
+    //so for the purpose of this test we increase premium and other amounts to make the demonstration clearer
+    it("when an insurance request is raised when pool is insufficient, request is denied", function () {
+      var insurance;
+
+      var account_one_starting_balance = humanReadableBalance(account_one);
+      var insureAmount = multiplier*230;
+      var poolSize = multiplier*1000;
+      var premium = multiplier*150;
+      var gasUsageEstimate = multiplier*45; //heuristic, as insurance.insure.estimateGas() returns NaN
+      var amountToVerify = gasUsageEstimate/ multiplier;
+
+      return Insurance.new().then(function(instance) {
+          insurance = instance;
+          return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+      }).then(function() {
+          return insurance.contribute.sendTransaction({from: account_sponsor, value: 0})
+      }).then(function() {
+          return insurance.insure.sendTransaction(insureAmount, {from:account_one, value: premium});
+      }).then(assert.fail)
+        .catch(function(error) {}).then(function() {
+          var account_one_ending_balance = humanReadableBalance(account_one);
+          assert.approximately(account_one_ending_balance, account_one_starting_balance - amountToVerify, 3, "account not affected");
+      })
+    })
+
   it('creation: should create an initial balance of 100 for the creator', function () {
     return Insurance.deployed().then(function(instance) {
       return instance.balanceOf.call(accounts[0])
