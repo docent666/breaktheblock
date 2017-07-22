@@ -31,9 +31,7 @@ contract('Insurance', function(accounts) {
         return insurance.insure.sendTransaction(insureAmount, {from:account_one, value: premium});
     }).then(function() {
         return insurance.claim.sendTransaction({from:account_one});
-//        return insurance.canClaim.sendTransaction({from:account_one});
     }).then(function() {
-//        assert.equal(canClaim, true, "can claim")
         return insurance.withdraw.sendTransaction({from:account_one});
     }).then(function() {
         var account_one_ending_balance = humanReadableBalance(account_one);
@@ -49,27 +47,34 @@ contract('Insurance', function(accounts) {
     }).catch((err) => { throw new Error(err) })
   })
 
-  it("can participate if pool maxed and will issue tokens", function () {
+  it("can participate if pool maxed and will issue tokens which allow withdrawal", function () {
     var insurance;
 
     var poolSize = Math.pow(10,16)*100;
     var insureAmount = Math.pow(10,16)*23;
+    var expectedWithdrawal = poolSize * 0.24 / Math.pow(10,16)
+    var account_two_starting_balance = humanReadableBalance(account_two);
 
-    return Insurance.deployed().then(function(instance) {
+    return Insurance.new().then(function(instance) {
         insurance = instance;
         return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
     }).then(function() {
         return insurance.contribute.sendTransaction({from: account_sponsor, value: poolSize +1})
     }).then(function() {
-        return insurance.participate.sendTransaction(account_two, 4, {from: account_sponsor})
+        return insurance.participate.sendTransaction(account_two, 24, {from: account_sponsor})
     }).then(function() {
         return insurance.balanceOf.call(account_two)
     }).then(function(result) {
-        assert.strictEqual(result.toNumber(), 4)
+        assert.strictEqual(result.toNumber(), 24)
         return insurance.balanceOf.call(account_sponsor)
     }).then(function(result) {
-        assert.strictEqual(result.toNumber(), 96)
-    }).catch((err) => { throw new Error(err) })
+        assert.strictEqual(result.toNumber(), 76)
+    }).then(function() {
+        return insurance.withdrawAsParticipant.sendTransaction({from: account_two})
+    }).then(function(result) {
+        var account_two_ending_balance = humanReadableBalance(account_two);
+        assert.approximately(account_two_ending_balance, account_two_starting_balance + expectedWithdrawal, 2, "not withdrawn expected amount");
+    })
 
     }
   )

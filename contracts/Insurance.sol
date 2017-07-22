@@ -4,12 +4,13 @@ import 'zeppelin-solidity/contracts/token/StandardToken.sol';
 
 contract Insurance is StandardToken {
 
-	string public name = "ClaiMeToken";
-	string public symbol = "CMT";
-	uint256 public decimals = 18;
-	uint256 public INITIAL_SUPPLY = 100;
+	string public constant name = "ClaiMeToken";
+	string public constant symbol = "CMT";
+	uint256 public constant decimals = 18;
+	uint256 public constant INITIAL_SUPPLY = 100;
 
 	uint MAXIMUM_POOL_SIZE = 0;
+    uint RETENTION = 0;
     bool contractFull = false;
 
 	struct Insured {
@@ -29,8 +30,9 @@ contract Insurance is StandardToken {
 	uint insurancesClaimed = 0;
 	uint insurancesLapsed = 0;
 	uint poolSize = 0;
+    uint premiums = 0;
 	//token retention ratio - 20% to remain with the owner (insurance company)
-	uint retention = 0;
+
 
 	function Insurance() {
 		owner = msg.sender;
@@ -40,7 +42,7 @@ contract Insurance is StandardToken {
 
 	function init(uint maxPoolSize, uint retentionRatio) owner_only {
 		MAXIMUM_POOL_SIZE = maxPoolSize;
-		retention = retentionRatio;
+		RETENTION = retentionRatio;
 	}
 
 	//fallback function
@@ -73,6 +75,7 @@ contract Insurance is StandardToken {
 	function insure(uint claimSize) payable {
 		var insured = Insured(false, false, claimSize, true, msg.value, now, now);
 		insurances[msg.sender] = insured;
+        premiums = premiums + msg.value;
 	}
 
 	function claim() {
@@ -81,25 +84,19 @@ contract Insurance is StandardToken {
 		}
 	}
 
-//	function canClaim() constant returns (bool claimable) {
-//		return insurances[msg.sender].claimable;
-//	}
-
 	function withdraw() payable {
 		if (insurances[msg.sender].withdrawable) {
 			msg.sender.transfer(insurances[msg.sender].claimSize);
 			insurances[msg.sender].claimed = true;
 		}
-//		} else {
-//			throw;
-//		}
-		//if msg address in insurances
-		//if claimable
-		//allow withdrawal of claim
+    }
 
-		//if participation token owner
-		//if all claims processed
-		//allow withdrawal of relevant fraction of the pool
-
-	}
+    //todo: only allow when all insurances are claimed or lapsed
+    function withdrawAsParticipant() payable returns (uint what) {
+        require(balances[msg.sender] > 0);
+        var toTransfer = contributors[owner] * balances[msg.sender] / INITIAL_SUPPLY;
+        msg.sender.transfer(toTransfer);
+        contributors[owner] = contributors[owner] - toTransfer;
+        return toTransfer;
+    }
 }
