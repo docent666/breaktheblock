@@ -30,6 +30,7 @@ contract Insurance is StandardToken {
 	uint insurancesClaimed = 0;
 	uint insurancesLapsed = 0;
 	uint poolSize = 0;
+    uint totalInsured = 0;
     uint premiums = 0;
 	//token retention ratio - 20% to remain with the owner (insurance company)
 
@@ -72,9 +73,11 @@ contract Insurance is StandardToken {
 		StandardToken.transferFrom(msg.sender, to, tokens);
 	}
 
-	function insure(uint claimSize) payable {
-		var insured = Insured(false, false, claimSize, true, msg.value, now, now);
+	function insure(uint insuranceAmount) payable {
+        require(poolSize >= totalInsured + insuranceAmount);
+		var insured = Insured(false, false, insuranceAmount, true, msg.value, now, now);
 		insurances[msg.sender] = insured;
+        totalInsured = totalInsured + insuranceAmount;
         premiums = premiums + msg.value;
 	}
 
@@ -96,8 +99,10 @@ contract Insurance is StandardToken {
     function withdrawAsParticipant() payable {
         require(balances[msg.sender] > 0);
         var toTransfer = contributors[owner] * balances[msg.sender] / INITIAL_SUPPLY;
-        msg.sender.transfer(toTransfer);
-        contributors[owner] = contributors[owner] - toTransfer;
+        var premiumsToTransfer = premiums * balances[msg.sender] / INITIAL_SUPPLY;
+        msg.sender.transfer(toTransfer + premiumsToTransfer);
+        contributors[owner] -= toTransfer;
+        premiums -= premiumsToTransfer;
 		//todo: no idea why we cannot move full balance, but hey, tired of invalid opcode  ¯\_(ツ)_/¯
 		StandardToken.approve(msg.sender, balanceOf(msg.sender) - 1);
 		//forfeit the tokens to prevent further withdrawals

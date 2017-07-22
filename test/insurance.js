@@ -1,5 +1,8 @@
 var Insurance = artifacts.require("./Insurance.sol");
 
+
+var multiplier = Math.pow(10,16)
+
 contract('Insurance', function(accounts) {
 
    //truffle will by default assign accounts[0] as na owner of the deployed contract
@@ -7,26 +10,26 @@ contract('Insurance', function(accounts) {
   const account_one = accounts[1];
   const account_two = accounts[2];
 
-  const amount = Math.pow(10,16)*88;
+  const amount = multiplier*88;
 
   function humanReadableBalance(account) {
-     return Math.floor(web3.eth.getBalance(account).toNumber()/Math.pow(10,16));
+     return Math.floor(web3.eth.getBalance(account).toNumber()/multiplier);
   }
 
   it("when an insurance claim is made on a seeded pool then insured amount can be withdrawn", function () {
     var insurance;
 
     var account_one_starting_balance = humanReadableBalance(account_one);
-    var insureAmount = Math.pow(10,16)*23;
-    var poolSize = Math.pow(10,16)*100;
-    var premium = Math.pow(10,16)*15;
-    var amountToVerify = (insureAmount - premium)/ Math.pow(10,16);
+    var insureAmount = multiplier*23;
+    var poolSize = multiplier*100;
+    var premium = multiplier*15;
+    var amountToVerify = (insureAmount - premium)/ multiplier;
 
     return Insurance.deployed().then(function(instance) {
         insurance = instance;
         return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
     }).then(function() {
-        return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount})
+        return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount + 10})
     }).then(function() {
         return insurance.insure.sendTransaction(insureAmount, {from:account_one, value: premium});
     }).then(function() {
@@ -39,6 +42,30 @@ contract('Insurance', function(accounts) {
     }).catch((err) => { throw new Error(err) })
   })
 
+    it("when an insurance claim is not made then insured amount can not be withdrawn", function () {
+      var insurance;
+
+      var account_one_starting_balance = humanReadableBalance(account_one);
+      var insureAmount = multiplier*23;
+      var poolSize = multiplier*100;
+      var premium = multiplier*15;
+      var amountToVerify = premium/ multiplier;
+
+      return Insurance.deployed().then(function(instance) {
+          insurance = instance;
+          return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+      }).then(function() {
+          return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount + 10})
+      }).then(function() {
+          return insurance.insure.sendTransaction(insureAmount, {from:account_one, value: premium});
+      }).then(function() {
+          return insurance.withdraw.sendTransaction({from:account_one});
+      }).then(function() {
+          var account_one_ending_balance = humanReadableBalance(account_one);
+          assert.approximately(account_one_ending_balance, account_one_starting_balance - amountToVerify, 3, "only premium should be deducted");
+      }).catch((err) => { throw new Error(err) })
+    })
+
   it('creation: should create an initial balance of 100 for the creator', function () {
     return Insurance.deployed().then(function(instance) {
       return instance.balanceOf.call(accounts[0])
@@ -50,9 +77,9 @@ contract('Insurance', function(accounts) {
   it("can participate if pool maxed and will issue tokens which allow withdrawal", function () {
     var insurance;
 
-    var poolSize = Math.pow(10,16)*100;
-    var insureAmount = Math.pow(10,16)*23;
-    var expectedWithdrawal = poolSize * 0.24 / Math.pow(10,16)
+    var poolSize = multiplier*100;
+    var insureAmount = multiplier*23;
+    var expectedWithdrawal = poolSize * 0.24 / multiplier
     var account_two_starting_balance = humanReadableBalance(account_two);
     var account_two_ending_balance = 0;
 
@@ -111,6 +138,7 @@ contract('Insurance', function(accounts) {
   //if not claimable do not allow to withdraw
   //if already claimed do not allow to withdraw
   //should not allow to insure if the premium is not paid
+  //test that premiums are included in withdrawal
 
 
 });
