@@ -101,7 +101,7 @@ contract Insurance is StandardToken {
 	//todo: bug around standard token transfer
     function withdrawAsParticipant() payable {
         require(balances[msg.sender] > 0);
-        require(block.timestamp > LAPSE_BLOCK);
+        require(block.timestamp >= LAPSE_BLOCK);
         var toTransfer = contributors[owner] * balances[msg.sender] / INITIAL_SUPPLY;
         var premiumsToTransfer = premiums * balances[msg.sender] / INITIAL_SUPPLY;
         msg.sender.transfer(toTransfer + premiumsToTransfer);
@@ -115,7 +115,7 @@ contract Insurance is StandardToken {
 
     function withdrawAsOwner() payable owner_only {
         require(balances[msg.sender] > 0);
-        require(block.timestamp > LAPSE_BLOCK);
+        require(block.timestamp >= LAPSE_BLOCK);
         var toTransfer = contributors[owner] * balances[msg.sender] / INITIAL_SUPPLY;
         var premiumsToTransfer = premiums * balances[msg.sender] / INITIAL_SUPPLY;
         msg.sender.transfer(toTransfer + premiumsToTransfer);
