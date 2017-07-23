@@ -13,7 +13,7 @@ contract Insurance is StandardToken {
     //token retention ratio - 20% to remain with the owner (insurance company). currently not used
     uint RETENTION = 0;
     uint LAPSE_BLOCK = 0;
-    bool contractFull = false;
+    bool public contractFull = false;
 
 	struct Insured {
 		bool withdrawable;

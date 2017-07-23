@@ -1,4 +1,4 @@
-#  \#BreakTheBlock London Insurance Hackathon Entry
+#  \#BreakTheBlock London Insurance Hackathon Entry for team RE-X
 
 #  Team
 Mark Painter
@@ -9,22 +9,24 @@ Hugh Karp
 # setup
 install zeppelin as per https://github.com/OpenZeppelin/zeppelin-solidity
 `npm install zeppelin-solidity`
-requires ethereum bridge (node bridge --dev) to run in order to allow oraclize query
+
+Requires ethereum bridge (node bridge --dev) to run in order to allow oraclize query
+
 also use testrpc `--mnemonic --accounts 10` to allow stable determination of OAR
-replace OAR in the weather insurance contract with value provided by ether bridge
+
+Replace OAR in the weather insurance contract with value provided by ether bridge
 (note: might not be necessary for newer versions of the bridge)
 
-## Building and the frontend
+## Building
 
-1. First run `truffle compile`, then run `truffle migrate` to deploy the contracts onto your network of choice (default "development").
-1. Then run `npm run dev` to build the app and serve it on http://localhost:8080
+Run `truffle compile`, then run `truffle migrate` to deploy the contracts onto your network of choice (default "development").
 
-#use
+#Use
 
 run the tests to see the interactions
-Insurance is a basic contract which allows immediate claim and withdrawal for insured customer
-ManualAuthorizationInsurance is a flavour of insurance requiring a third party authorization, from account assigned by contract owner
-WeatherOracleAuthorizationInsurance is a contract where a cloudy weather in dallas retrieved via oraclize will determine if claim is authorized
+* Insurance is a basic contract which allows immediate claim and withdrawal for insured customer
+* ManualAuthorizationInsurance is a flavour of insurance requiring a third party authorization, from account assigned by contract owner
+* WeatherOracleAuthorizationInsurance is a contract where a cloudy weather in dallas retrieved via oraclize will determine if claim is authorized
 
 #process flow
 1. insurer issues a contract representing a pool if insurances, seeds it with initial money
