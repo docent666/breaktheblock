@@ -44,17 +44,18 @@ claim process
 
 
 #versions
-###0.0.1	
+
+### 0.0.1	
     insurance - methods insure, claim, withdraw only with a participation token, fully collateralized, insure only up to financing pool size
 	participation contracts - issue 100 tokens to participants, associate with insurance contract
 	presentation to demonstrate the expected flow
 	deployed to testrpc
 	
-###0.0.2
+### 0.0.2
     integration with oraclize datasource to demo automated confirmation of a claim verification
     pluggable claim verification mechanism
 
-###future
+### future
     UI for customer and insurance exchange
     identity verification of the insured via estonian id
     association of insurance value with fiat currency exchange price
