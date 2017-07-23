@@ -21,14 +21,14 @@ Replace OAR in the weather insurance contract with value provided by ether bridg
 
 Run `truffle compile`, then run `truffle migrate` to deploy the contracts onto your network of choice (default "development").
 
-#Use
+# Use
 
 run the tests to see the interactions
 * Insurance is a basic contract which allows immediate claim and withdrawal for insured customer
 * ManualAuthorizationInsurance is a flavour of insurance requiring a third party authorization, from account assigned by contract owner
 * WeatherOracleAuthorizationInsurance is a contract where a cloudy weather in dallas retrieved via oraclize will determine if claim is authorized
 
-#process flow
+# process flow
 1. insurer issues a contract representing a pool if insurances, seeds it with initial money
 2. clients are assigned to contract and upon a payment of premium are added to insured list
 3. when a required pool size is reached, insurer issues tokens (ERC20 standard) that it posts on an insurance exchange (open or restricted market)
@@ -43,7 +43,7 @@ claim process
 3. successful claim allows the customer to withdraw the amount insured
 
 
-#versions
+# versions
 
 ### 0.0.1	
     insurance - methods insure, claim, withdraw only with a participation token, fully collateralized, insure only up to financing pool size
