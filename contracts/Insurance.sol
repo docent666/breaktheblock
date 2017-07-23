@@ -84,7 +84,7 @@ contract Insurance is StandardToken {
         premiums = premiums + msg.value;
 	}
 
-	function claim() {
+	function claim() payable {
 		if (insurances[msg.sender].exists) {
 			insurances[msg.sender].withdrawable = true;
 		}

@@ -22,7 +22,7 @@ contract ManualAuthorizationInsurance is Insurance {
         authoriser = auth;
     }
 
-    function claim() {
+    function claim() payable {
         RequestAuthorisation(msg.sender);
     }
 

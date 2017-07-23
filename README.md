@@ -9,6 +9,10 @@ Hugh Karp
 # setup
 install zeppelin as per https://github.com/OpenZeppelin/zeppelin-solidity
 `npm install zeppelin-solidity`
+requires ethereum bridge (node bridge --dev) to run in order to allow oraclize query
+also use testrpc `--mnemonic --accounts 10` to allow stable determination of OAR
+replace OAR in the weather insurance contract with value provided by ether bridge
+(note: might not be necessary for newer versions of the bridge)
 
 ## Building and the frontend
 
