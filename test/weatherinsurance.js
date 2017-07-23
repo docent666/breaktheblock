@@ -16,7 +16,7 @@ contract('WeatherOracleAuthorizationInsurance', function(accounts) {
      return Math.floor(web3.eth.getBalance(account).toNumber()/multiplier);
   }
 
-  it("when an insurance claim is made on a seeded pool then insured amount can be withdrawn only when authorised", function () {
+  it("when an insurance claim is made on a seeded pool then insured amount can be withdrawn only when the weather is cloudy", function () {
     var insurance;
 
     var account_one_starting_balance = humanReadableBalance(account_one);
