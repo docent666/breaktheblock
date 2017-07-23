@@ -12,6 +12,7 @@ contract Insurance is StandardToken {
 	uint MAXIMUM_POOL_SIZE = 0;
     //token retention ratio - 20% to remain with the owner (insurance company). currently not used
     uint RETENTION = 0;
+    uint LAPSE_BLOCK = 0;
     bool contractFull = false;
 
 	struct Insured {
@@ -42,9 +43,10 @@ contract Insurance is StandardToken {
 		balances[msg.sender] = INITIAL_SUPPLY;
 	}
 
-	function init(uint maxPoolSize, uint retentionRatio) owner_only {
+	function init(uint maxPoolSize, uint retentionRatio, uint lapseBlock) owner_only {
 		MAXIMUM_POOL_SIZE = maxPoolSize;
 		RETENTION = retentionRatio;
+        LAPSE_BLOCK = lapseBlock;
 	}
 
 	//fallback function
@@ -99,6 +101,7 @@ contract Insurance is StandardToken {
 	//todo: bug around standard token transfer
     function withdrawAsParticipant() payable {
         require(balances[msg.sender] > 0);
+        require(block.timestamp > LAPSE_BLOCK);
         var toTransfer = contributors[owner] * balances[msg.sender] / INITIAL_SUPPLY;
         var premiumsToTransfer = premiums * balances[msg.sender] / INITIAL_SUPPLY;
         msg.sender.transfer(toTransfer + premiumsToTransfer);
@@ -112,6 +115,7 @@ contract Insurance is StandardToken {
 
     function withdrawAsOwner() payable owner_only {
         require(balances[msg.sender] > 0);
+        require(block.timestamp > LAPSE_BLOCK);
         var toTransfer = contributors[owner] * balances[msg.sender] / INITIAL_SUPPLY;
         var premiumsToTransfer = premiums * balances[msg.sender] / INITIAL_SUPPLY;
         msg.sender.transfer(toTransfer + premiumsToTransfer);

@@ -3,6 +3,11 @@ require('babel-register')
 
 module.exports = {
   networks: {
+    "tital": {
+      network_id: 20170125,
+      host: "localhost",
+      port: 30303
+    },
     development: {
       host: 'localhost',
       port: 8545,

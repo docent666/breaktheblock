@@ -24,10 +24,11 @@ contract('Insurance', function(accounts) {
     var poolSize = multiplier*100;
     var premium = multiplier*15;
     var amountToVerify = (insureAmount - premium)/ multiplier;
+    var timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp
 
     return Insurance.deployed().then(function(instance) {
         insurance = instance;
-        return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+        return insurance.init.sendTransaction(poolSize, poolSize/2, timestamp, {from: account_sponsor})
     }).then(function() {
         return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount + 10})
     }).then(function() {
@@ -50,10 +51,11 @@ contract('Insurance', function(accounts) {
       var poolSize = multiplier*100;
       var premium = multiplier*15;
       var amountToVerify = premium/ multiplier;
+      var timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp
 
       return Insurance.deployed().then(function(instance) {
           insurance = instance;
-          return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+          return insurance.init.sendTransaction(poolSize, poolSize/2, timestamp, {from: account_sponsor})
       }).then(function() {
           return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount + 10})
       }).then(function() {
@@ -78,10 +80,11 @@ contract('Insurance', function(accounts) {
       var premium = multiplier*150;
       var gasUsageEstimate = multiplier*45; //heuristic, as insurance.insure.estimateGas() returns NaN
       var amountToVerify = gasUsageEstimate/ multiplier;
+      var timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp
 
       return Insurance.new().then(function(instance) {
           insurance = instance;
-          return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+          return insurance.init.sendTransaction(poolSize, poolSize/2, timestamp, {from: account_sponsor})
       }).then(function() {
           return insurance.contribute.sendTransaction({from: account_sponsor, value: 0})
       }).then(function() {
@@ -109,10 +112,11 @@ contract('Insurance', function(accounts) {
     var expectedWithdrawal = poolSize * 0.24 / multiplier
     var account_two_starting_balance = humanReadableBalance(account_two);
     var account_two_ending_balance = 0;
+    var timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp
 
     return Insurance.new().then(function(instance) {
         insurance = instance;
-        return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+        return insurance.init.sendTransaction(poolSize, poolSize/2, timestamp, {from: account_sponsor})
     }).then(function() {
         return insurance.contribute.sendTransaction({from: account_sponsor, value: poolSize +1})
     }).then(function() {
@@ -151,13 +155,14 @@ contract('Insurance', function(accounts) {
       var insurance;
 
       var poolSize = multiplier*1000;
-      var gasConsumption = multiplier*10;
+      var gasConsumption = multiplier*12;
       var expectedWithdrawal = (gasConsumption)/ multiplier
       var account_sponsor_starting_balance = humanReadableBalance(account_sponsor);
+      var timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp
 
       return Insurance.new().then(function(instance) {
           insurance = instance;
-          return insurance.init.sendTransaction(poolSize, poolSize/2, {from: account_sponsor})
+          return insurance.init.sendTransaction(poolSize, poolSize/2, timestamp, {from: account_sponsor})
       }).then(function() {
           return insurance.contribute.sendTransaction({from: account_sponsor, value: poolSize +1})
       }).then(function() {
@@ -182,6 +187,7 @@ contract('Insurance', function(accounts) {
 //    })
 //  })
 
+    //test timestamp preventing withdrawal from owner and participant
    //test init function
    //add checks that the max and ratio are used
   //if not claimable do not allow to withdraw
