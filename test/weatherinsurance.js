@@ -23,7 +23,7 @@ contract('WeatherOracleAuthorizationInsurance', function(accounts) {
     var insureAmount = multiplier*23;
     var poolSize = multiplier*100;
     var premium = multiplier*15;
-    var claimCharge = multiplier*15;
+    var claimCharge = multiplier*150;
     var amountToVerify = (insureAmount - premium)/ multiplier;
     var timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp
 
