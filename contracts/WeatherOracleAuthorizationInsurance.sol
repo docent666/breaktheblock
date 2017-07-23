@@ -11,7 +11,7 @@ contract WeatherOracleAuthorizationInsurance is Insurance, usingOraclize {
 
     function WeatherOracleAuthorizationInsurance() {
         owner = msg.sender;
-        OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
+        OAR = OraclizeAddrResolverI(0xFE9705f2BE41Eed2C5922284874F9Caa27A30c5D);
     }
 
     event updatedClaim(string result);
