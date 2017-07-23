@@ -28,12 +28,12 @@ contract Insurance is StandardToken {
 	address owner;
 	mapping(address => Insured) insurances;
 	mapping(address => uint) contributors;
-	uint insurancesCount = 0;
+	uint public insurancesCount = 0;
 	uint insurancesClaimed = 0;
 	uint insurancesLapsed = 0;
 	uint poolSize = 0;
-    uint totalInsured = 0;
-    uint premiums = 0;
+    uint public totalInsured = 0;
+    uint public premiums = 0;
 
 
 
