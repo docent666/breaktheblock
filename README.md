@@ -29,6 +29,11 @@ run the tests to see the interactions
 * ManualAuthorizationInsurance is a flavour of insurance requiring a third party authorization, from account assigned by contract owner
 * WeatherOracleAuthorizationInsurance is a contract where a cloudy weather in dallas retrieved via oraclize will determine if claim is authorized
 
+# Frontend
+install the truffle solidity loader:
+`npm install truffle-solidity-loader --save-dev`
+use `npm run dev` to execute the server at localhost:8080
+
 # process flow
 1. insurer issues a contract representing a pool if insurances, seeds it with initial money
 2. clients are assigned to contract and upon a payment of premium are added to insured list
@@ -55,6 +60,9 @@ claim process
 ### 0.0.2
     integration with oraclize datasource to demo automated confirmation of a claim verification
     pluggable claim verification mechanism
+    
+### 0.0.3
+    working interaction with web ui
 
 ### future
     UI for customer and insurance exchange

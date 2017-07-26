@@ -22,6 +22,7 @@ module.exports = {
     ],
     loaders: [
       { test: /\.json$/, use: 'json-loader' },
+      { test: /\.sol$/, use: 'truffle-solidity' },
       {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
