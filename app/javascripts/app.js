@@ -40,6 +40,7 @@ window.App = {
       account = accounts[0];
 
       self.refreshBalance();
+      self.isContractFull();
     });
   },
 
@@ -53,7 +54,7 @@ window.App = {
 
     var ins;
     Insurance.deployed().then(function(instance) {
-      meta = instance;
+      ins = instance;
       return ins.balanceOf.call(account, {from: account});
     }).then(function(value) {
       var balance_element = document.getElementById("balance");
@@ -83,7 +84,42 @@ window.App = {
       console.log(e);
       self.setStatus("Error sending coin; see log.");
     });
-  }
+  },
+
+   fund: function() {
+    var self = this;
+
+    var amount = parseInt(document.getElementById("fundAmount").value);
+    this.setStatus("Initiating transaction... (please wait)");
+
+    var ins;
+    Insurance.deployed().then(function(instance) {
+      ins = instance;
+      return ins.contribute({from: account, value: amount});
+    }).then(function() {
+      self.setStatus("Transaction complete!");
+      self.isContractFull();
+    }).catch(function(e) {
+      console.log(e);
+      self.setStatus("Error sending coin; see log.");
+    });
+   },
+
+   isContractFull: function() {
+    var self = this;
+
+    var ins;
+    Insurance.deployed().then(function(instance) {
+      ins = instance;
+      return ins.contractFull.call({from: account});
+    }).then(function(value) {
+      var contractFull_element = document.getElementById("contractFull");
+      contractFull_element.innerHTML = value.valueOf();
+    }).catch(function(e) {
+      console.log(e);
+      self.setStatus("Error getting contract status; see log.");
+    });
+   }
 };
 
 window.addEventListener('load', function() {

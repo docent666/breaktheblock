@@ -8,6 +8,13 @@
 <body>
   <h1>ReX Insurance</h1>
   <h3>Contract owner has <span class="black"><span id="balance"></span> CMT tokens.</span></h3>
+  <h3>Contract ready to tokenize? <span class="black"><span id="contractFull"></span></span></h3>
+
+  <br>
+  <h1>Fund contract</h1>
+  <br><label for="fundAmount">Amount:</label><input type="text" id="fundAmount" placeholder="e.g., 95"></input>
+  <br><br><button id="send" onclick="App.fund()">Fund</button>
+  <br><br>
 
   <br>
   <h1>Send CMT to participants</h1>
