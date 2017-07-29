@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ReX insurance - Client User Interface</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <script src="./app.js"></script>
+</head>
+<body>
+  <h1>Insure your home</h1>
+  <br>
+  <br><label for="insuranceAmount">Asset value (in Ether):</label><input type="text" id="insuranceAmount" placeholder="1000"></input>
+  <br><label for="period">Insurance period (years):</label><input type="text" id="period" placeholder="e.g., 1"></input>
+  <br>Premium: 10%
+  <br><br><button id="send" onclick="App.insure()">Insure your home</button>
+  <br><br>
+
+  <span id="status"></span>
+  <h3>Full?<span class="black"><span id="contractFull"></span></span></h3>
+</body>
+</html>

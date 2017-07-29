@@ -1,19 +1,12 @@
-// Import the page's CSS. Webpack will know what to do with it.
 import "../stylesheets/app.css";
 
-// Import libraries we need.
 import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract'
 
-// Import our contract artifacts and turn them into usable abstractions.
 import insurance_artifacts from '../../build/contracts/Insurance.json'
 
-// MetaCoin is our usable abstraction, which we'll use through the code below.
 var Insurance = contract(insurance_artifacts);
 
-// The following code is simple to show off interacting with your contracts.
-// As your needs grow you will likely need to change its form and structure.
-// For application bootstrapping, check out window.addEventListener below.
 var accounts;
 var account;
 
@@ -21,10 +14,8 @@ window.App = {
   start: function() {
     var self = this;
 
-    // Bootstrap the Insurance abstraction for Use.
     Insurance.setProvider(web3.currentProvider);
 
-    // Get the initial account balance so it can be displayed.
     web3.eth.getAccounts(function(err, accs) {
       if (err != null) {
         alert("There was an error fetching your accounts.");
@@ -41,6 +32,7 @@ window.App = {
 
       self.refreshBalance();
       self.isContractFull();
+      self.totalInsuranceAmount();
     });
   },
 
@@ -104,6 +96,24 @@ window.App = {
       self.setStatus("Error sending coin; see log.");
     });
    },
+   insure: function() {
+    var self = this;
+
+    var insuranceAmount = parseInt(document.getElementById("insuranceAmount").value);
+    var premium = insuranceAmount / 10 ;
+    this.setStatus("Initiating transaction... (please wait)");
+
+    var ins;
+    Insurance.deployed().then(function(instance) {
+      ins = instance;
+      return ins.insure(insuranceAmount, {from: account, value: premium});
+    }).then(function() {
+      self.setStatus("Transaction complete!");
+    }).catch(function(e) {
+      console.log(e);
+      self.setStatus("Error sending coin; see log.");
+    });
+   },
 
    isContractFull: function() {
     var self = this;
@@ -114,6 +124,21 @@ window.App = {
       return ins.contractFull.call({from: account});
     }).then(function(value) {
       var contractFull_element = document.getElementById("contractFull");
+      contractFull_element.innerHTML = value.valueOf();
+    }).catch(function(e) {
+      console.log(e);
+      self.setStatus("Error getting contract status; see log.");
+    });
+   },
+   totalInsuranceAmount: function() {
+    var self = this;
+
+    var ins;
+    Insurance.deployed().then(function(instance) {
+      ins = instance;
+      return ins.totalInsured.call({from: account});
+    }).then(function(value) {
+      var contractFull_element = document.getElementById("totalInsuranceAmount");
       contractFull_element.innerHTML = value.valueOf();
     }).catch(function(e) {
       console.log(e);

@@ -23,6 +23,7 @@ contract Insurance is StandardToken {
 		uint premium;
         uint policyStartTime;
         uint policyEndTime;
+		//underlying
 	}
 
 	address owner;
@@ -34,8 +35,6 @@ contract Insurance is StandardToken {
 	uint poolSize = 0;
     uint public totalInsured = 0;
     uint public premiums = 0;
-
-
 
 	function Insurance() {
 		owner = msg.sender;
@@ -84,6 +83,7 @@ contract Insurance is StandardToken {
         premiums = premiums + msg.value;
 	}
 
+// this function should be overriden in non-demo versions of the contract to allow injection of claim procedures
 	function claim() payable {
 		if (insurances[msg.sender].exists) {
 			insurances[msg.sender].withdrawable = true;
