@@ -9,7 +9,14 @@
   },
   "author": "Crowd Re (Lukasz, Mark, Hugh, Joseph)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docent666/re-x.git"
+  },
   "devDependencies": {
+    "babel-preset-stage-2": "^6.22.0",
+    "babel-preset-stage-3": "^6.22.0",
+    "babel-polyfill": "^6.7.4",
     "babel-cli": "^6.22.2",
     "babel-core": "^6.22.1",
     "babel-eslint": "^6.1.2",

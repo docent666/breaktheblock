@@ -16,7 +16,7 @@ contract('ManualAuthorizationInsurance', function(accounts) {
      return Math.floor(web3.eth.getBalance(account).toNumber()/multiplier);
   }
 
-  it("when an insurance claim is made on a seeded pool then insured amount can be withdrawn only when authorised", function () {
+  it("when an insurance claim is made on a seeded pool then insured amount can be withdrawn only when authorised", async function () {
     var insurance;
 
     var account_one_starting_balance = humanReadableBalance(account_one);
@@ -26,25 +26,16 @@ contract('ManualAuthorizationInsurance', function(accounts) {
     var amountToVerify = (insureAmount - premium)/ multiplier;
     var timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp
 
-    return Insurance.deployed().then(function(instance) {
-        insurance = instance;
-        return insurance.init.sendTransaction(poolSize, poolSize/2, timestamp, {from: account_sponsor})
-    }).then(function() {
-        return insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount + 10})
-    }).then(function() {
-        return insurance.insure.sendTransaction(insureAmount, {from:account_one, value: premium});
-    }).then(function() {
-        return insurance.claim.sendTransaction({from:account_one});
-    }).then(function() {
-        return insurance.assignAuthoriser.sendTransaction(account_authorizer, {from:account_sponsor});
-    }).then(function() {
-        return insurance.authoriseClaim.sendTransaction(account_one, {from:account_authorizer});
-    }).then(function() {
-        return insurance.withdraw.sendTransaction({from:account_one});
-    }).then(function() {
-        var account_one_ending_balance = humanReadableBalance(account_one);
-        assert.approximately(account_one_ending_balance, account_one_starting_balance + amountToVerify, 3, "claim not recorded properly");
-    }).catch((err) => { throw new Error(err) })
+    var insurance = await Insurance.deployed();
+    await insurance.init.sendTransaction(poolSize, poolSize/2, timestamp, {from: account_sponsor});
+    await insurance.contribute.sendTransaction({from: account_sponsor, value: insureAmount + 10});
+    await insurance.insure.sendTransaction(insureAmount, {from:account_one, value: premium});
+    await insurance.claim.sendTransaction({from:account_one});
+    await insurance.assignAuthoriser.sendTransaction(account_authorizer, {from:account_sponsor});
+    await insurance.authoriseClaim.sendTransaction(account_one, {from:account_authorizer});
+    await insurance.withdraw.sendTransaction({from:account_one});
+    var account_one_ending_balance = humanReadableBalance(account_one);
+    assert.approximately(account_one_ending_balance, account_one_starting_balance + amountToVerify, 3, "claim not recorded properly");
   })
 
 });
