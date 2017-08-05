@@ -107,10 +107,9 @@ contract Insurance is StandardToken {
         msg.sender.transfer(toTransfer + premiumsToTransfer);
         contributors[owner] -= toTransfer;
         premiums -= premiumsToTransfer;
-		//todo: no idea why we cannot move full balance, but hey, tired of invalid opcode  ¯\_(ツ)_/¯
-		approve(msg.sender, balanceOf(msg.sender) - 1);
+		approve(msg.sender, balanceOf(msg.sender));
 		//forfeit the tokens to prevent further withdrawals
-		transferFrom(msg.sender, this, balanceOf(msg.sender) -1);
+		transferFrom(msg.sender, this, balanceOf(msg.sender));
     }
 
     function withdrawAsOwner() payable owner_only {

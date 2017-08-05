@@ -106,8 +106,7 @@ contract('Insurance', function(accounts) {
     account_two_ending_balance = humanReadableBalance(account_two);
     assert.approximately(account_two_ending_balance, account_two_starting_balance + expectedWithdrawal, 2, "not withdrawn expected amount");
     var finalOneBalance = await insurance.balanceOf.call(account_two)
-        //todo: that's a bug
-    assert.strictEqual(finalOneBalance.toNumber(), 1)
+    assert.strictEqual(finalOneBalance.toNumber(), 0)
     var finalSponsorBalance = await insurance.balanceOf.call(account_sponsor)
     assert.strictEqual(finalSponsorBalance.toNumber(), 76)
     }
@@ -117,8 +116,8 @@ contract('Insurance', function(accounts) {
     var poolSize = multiplier*100;
     var insureAmount = multiplier*23;
     var expectedWithdrawal = poolSize * 0.24 / multiplier
+    var gasUsageEstimate = multiplier*45 / multiplier;
     var account_two_starting_balance = humanReadableBalance(account_two);
-    var account_two_ending_balance = 0;
     var timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp
 
     var insurance =  await Insurance.new();
@@ -126,11 +125,16 @@ contract('Insurance', function(accounts) {
     await insurance.contribute.sendTransaction({from: account_sponsor, value: poolSize +1});
     await insurance.participate.sendTransaction(account_two, 24, {from: account_sponsor});
     await insurance.withdrawAsParticipant.sendTransaction({from: account_two})
-    account_two_ending_balance = humanReadableBalance(account_two);
+    var account_two_ending_balance = humanReadableBalance(account_two);
     assert.approximately(account_two_ending_balance, account_two_starting_balance + expectedWithdrawal, 2, "not withdrawn expected amount");
-    await insurance.withdrawAsParticipant.sendTransaction({from: account_two})
-    var account_two_new_ending_balance = humanReadableBalance(account_two);
-    assert.approximately(account_two_new_ending_balance, account_two_ending_balance, 2, "should not allow to withdraw twice");
+    try {
+        await insurance.withdrawAsParticipant.sendTransaction({from: account_two});
+        assert.fail();
+    }
+    catch(error) {
+        var account_two_new_ending_balance = humanReadableBalance(account_two);
+        assert.approximately(account_two_new_ending_balance, account_two_ending_balance - gasUsageEstimate, 2, "should not allow to withdraw twice");
+     }
   })
 
     it("if no other participants, owner is sole participants and can withdraw", async function () {
