@@ -18,8 +18,6 @@ contract('Insurance', function(accounts) {
   }
 
   it("when an insurance claim is made on a seeded pool then insured amount can be withdrawn", async function () {
-    var insurance;
-
     var account_one_starting_balance = humanReadableBalance(account_one);
     var insureAmount = multiplier*23;
     var poolSize = multiplier*100;
@@ -39,8 +37,6 @@ contract('Insurance', function(accounts) {
   })
 
     it("when an insurance claim is not made then insured amount can not be withdrawn", async function () {
-      var insurance;
-
       var account_one_starting_balance = humanReadableBalance(account_one);
       var insureAmount = multiplier*23;
       var poolSize = multiplier*100;
@@ -61,8 +57,6 @@ contract('Insurance', function(accounts) {
     //in this case however the gas used appears to be more than the provided premium in other tests
     //so for the purpose of this test we increase premium and other amounts to make the demonstration clearer
     it("when an insurance request is raised when pool is insufficient, request is denied", async function () {
-      var insurance;
-
       var account_one_starting_balance = humanReadableBalance(account_one);
       var insureAmount = multiplier*230;
       var poolSize = multiplier*1000;
@@ -91,8 +85,6 @@ contract('Insurance', function(accounts) {
   })
 
   it("can participate if pool maxed and will issue tokens which allow withdrawal", async function () {
-    var insurance;
-
     var poolSize = multiplier*100;
     var insureAmount = multiplier*23;
     var expectedWithdrawal = poolSize * 0.24 / multiplier
@@ -108,15 +100,11 @@ contract('Insurance', function(accounts) {
     assert.strictEqual(oneBalance.toNumber(), 24)
     var sponsorBalance = await insurance.balanceOf.call(account_sponsor)
     assert.strictEqual(sponsorBalance.toNumber(), 76)
+
     await insurance.withdrawAsParticipant.sendTransaction({from: account_two})
 
     account_two_ending_balance = humanReadableBalance(account_two);
     assert.approximately(account_two_ending_balance, account_two_starting_balance + expectedWithdrawal, 2, "not withdrawn expected amount");
-
-    await insurance.withdrawAsParticipant.sendTransaction({from: account_two})
-
-    var account_two_new_ending_balance = humanReadableBalance(account_two);
-    assert.approximately(account_two_ending_balance, account_two_new_ending_balance, 2, "should not allow to withdraw twice");
     var finalOneBalance = await insurance.balanceOf.call(account_two)
         //todo: that's a bug
     assert.strictEqual(finalOneBalance.toNumber(), 1)
@@ -124,6 +112,26 @@ contract('Insurance', function(accounts) {
     assert.strictEqual(finalSponsorBalance.toNumber(), 76)
     }
   )
+
+  it("should not allow further withdrawals if already withdrawn", async function () {
+    var poolSize = multiplier*100;
+    var insureAmount = multiplier*23;
+    var expectedWithdrawal = poolSize * 0.24 / multiplier
+    var account_two_starting_balance = humanReadableBalance(account_two);
+    var account_two_ending_balance = 0;
+    var timestamp = web3.eth.getBlock(web3.eth.blockNumber).timestamp
+
+    var insurance =  await Insurance.new();
+    await insurance.init.sendTransaction(poolSize, poolSize/2, timestamp, {from: account_sponsor});
+    await insurance.contribute.sendTransaction({from: account_sponsor, value: poolSize +1});
+    await insurance.participate.sendTransaction(account_two, 24, {from: account_sponsor});
+    await insurance.withdrawAsParticipant.sendTransaction({from: account_two})
+    account_two_ending_balance = humanReadableBalance(account_two);
+    assert.approximately(account_two_ending_balance, account_two_starting_balance + expectedWithdrawal, 2, "not withdrawn expected amount");
+    await insurance.withdrawAsParticipant.sendTransaction({from: account_two})
+    var account_two_new_ending_balance = humanReadableBalance(account_two);
+    assert.approximately(account_two_new_ending_balance, account_two_ending_balance, 2, "should not allow to withdraw twice");
+  })
 
     it("if no other participants, owner is sole participants and can withdraw", async function () {
       var insurance;
@@ -143,18 +151,7 @@ contract('Insurance', function(accounts) {
       }
     )
 
-//  it("should not allow further withdrawals if already withdrawn", function () {
-//   var insurance;
-//   var account_two_starting_balance = humanReadableBalance(account_two);
-//
-//   return Insurance.deployed().then(function(instance) {
-//          insurance = instance;
-//          return insurance.withdrawAsParticipant.sendTransaction({from: account_two})
-//   }).then(function(result) {
-//          var account_two_ending_balance = humanReadableBalance(account_two);
-//          assert.approximately(account_two_ending_balance, account_two_starting_balance, 2, "should be the same balance");
-//    })
-//  })
+
 
     //test timestamp preventing withdrawal from owner and participant
    //test init function
