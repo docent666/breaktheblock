@@ -5,7 +5,7 @@ var multiplier = Math.pow(10,16)
 
 contract('ManualAuthorizationInsurance', function(accounts) {
 
-   //truffle will by default assign accounts[0] as na owner of the deployed contract
+   //truffle will by default assign accounts[0] as an owner of the deployed contract
   const account_sponsor = accounts[0];
   const account_one = accounts[1];
   const account_authorizer = accounts[2];

@@ -6,7 +6,7 @@ var multiplier = Math.pow(10,16)
 
 contract('Insurance', function(accounts) {
 
-   //truffle will by default assign accounts[0] as na owner of the deployed contract
+   //truffle will by default assign accounts[0] as an owner of the deployed contract
   const account_sponsor = accounts[0];
   const account_one = accounts[1];
   const account_two = accounts[2];
@@ -149,7 +149,7 @@ contract('Insurance', function(accounts) {
       var insurance = await Insurance.new();
       await insurance.init.sendTransaction(poolSize, poolSize/2, timestamp, {from: account_sponsor});
       await insurance.contribute.sendTransaction({from: account_sponsor, value: poolSize +1});
-      await insurance.withdrawAsOwner.sendTransaction({from: account_sponsor});
+      await insurance.withdrawAsParticipant.sendTransaction({from: account_sponsor});
       var account_sponsor_ending_balance = humanReadableBalance(account_sponsor);
       assert.approximately(account_sponsor_ending_balance, account_sponsor_starting_balance - expectedWithdrawal, 2, "not withdrawn expected amount");
       }

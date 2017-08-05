@@ -66,13 +66,13 @@ contract Insurance is StandardToken {
         if (poolSize >= MAXIMUM_POOL_SIZE) {
 			contractFull = true;
 			//contract is filled, so we can now release participation tokens
-			StandardToken.approve(owner, INITIAL_SUPPLY);
+			approve(owner, INITIAL_SUPPLY);
 		}
 	}
 
 	function participate(address to, uint tokens) payable owner_only {
         require(contractFull);
-		StandardToken.transferFrom(msg.sender, to, tokens);
+		transferFrom(msg.sender, to, tokens);
 	}
 
 	function insure(uint insuranceAmount) payable {
@@ -98,7 +98,6 @@ contract Insurance is StandardToken {
     }
 
     //todo: only allow when all insurances are claimed or lapsed
-	//todo: bug around standard token transfer
     function withdrawAsParticipant() payable {
         require(balances[msg.sender] > 0);
         require(block.timestamp >= LAPSE_BLOCK);
@@ -107,20 +106,9 @@ contract Insurance is StandardToken {
         msg.sender.transfer(toTransfer + premiumsToTransfer);
         contributors[owner] -= toTransfer;
         premiums -= premiumsToTransfer;
-		approve(msg.sender, balanceOf(msg.sender));
+		if (msg.sender != owner) {approve(msg.sender, balanceOf(msg.sender));}
 		//forfeit the tokens to prevent further withdrawals
 		transferFrom(msg.sender, this, balanceOf(msg.sender));
     }
 
-    function withdrawAsOwner() payable owner_only {
-        require(balances[msg.sender] > 0);
-        require(block.timestamp >= LAPSE_BLOCK);
-        var toTransfer = contributors[owner] * balances[msg.sender] / INITIAL_SUPPLY;
-        var premiumsToTransfer = premiums * balances[msg.sender] / INITIAL_SUPPLY;
-        msg.sender.transfer(toTransfer + premiumsToTransfer);
-        contributors[owner] -= toTransfer;
-        premiums -= premiumsToTransfer;
-        //forfeit the tokens to prevent further withdrawals
-        StandardToken.transferFrom(msg.sender, this, balanceOf(msg.sender));
-    }
 }
