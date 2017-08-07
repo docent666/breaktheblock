@@ -1,8 +1,9 @@
 pragma solidity ^0.4.2;
 
 import 'zeppelin-solidity/contracts/token/StandardToken.sol';
+import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
-contract Insurance is StandardToken {
+contract Insurance is StandardToken, Ownable {
 
 	string public constant name = "ClaiMeToken";
 	string public constant symbol = "CMT";
@@ -26,7 +27,6 @@ contract Insurance is StandardToken {
 		//underlying
 	}
 
-	address owner;
 	mapping(address => Insured) insurances;
 	mapping(address => uint) contributors;
 	uint public insurancesCount = 0;
@@ -37,12 +37,11 @@ contract Insurance is StandardToken {
     uint public premiums = 0;
 
 	function Insurance() {
-		owner = msg.sender;
 		totalSupply = INITIAL_SUPPLY;
 		balances[msg.sender] = INITIAL_SUPPLY;
 	}
 
-	function init(uint maxPoolSize, uint retentionRatio, uint lapseBlock) owner_only {
+	function init(uint maxPoolSize, uint retentionRatio, uint lapseBlock) onlyOwner {
 		MAXIMUM_POOL_SIZE = maxPoolSize;
 		RETENTION = retentionRatio;
         LAPSE_BLOCK = lapseBlock;
@@ -54,12 +53,7 @@ contract Insurance is StandardToken {
 		throw;
 	}
 
-	modifier owner_only() {
-		require(msg.sender == owner);
-		_;
-	}
-
-	function contribute() payable owner_only {
+	function contribute() payable onlyOwner {
         require(!contractFull);
 		poolSize = poolSize + msg.value;
 		contributors[msg.sender] = contributors[msg.sender] + msg.value;
@@ -70,7 +64,7 @@ contract Insurance is StandardToken {
 		}
 	}
 
-	function participate(address to, uint tokens) payable owner_only {
+	function participate(address to, uint tokens) payable onlyOwner {
         require(contractFull);
 		transferFrom(msg.sender, to, tokens);
 	}

@@ -5,12 +5,10 @@ import './usingOraclize.sol';
 
 contract WeatherOracleAuthorizationInsurance is Insurance, usingOraclize {
 
-    address owner;
     string expectedWeather = "Partly Cloudy";
     mapping(bytes32=>address) validIds;
 
     function WeatherOracleAuthorizationInsurance() {
-        owner = msg.sender;
         OAR = OraclizeAddrResolverI(0xFE9705f2BE41Eed2C5922284874F9Caa27A30c5D);
     }
 
