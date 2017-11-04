@@ -1,6 +1,9 @@
 #  \#BreakTheBlock London Insurance Hackathon Entry for team RE-X
 # RUNNER UP PRIZE: Most Sophisticated Insurance Product
 
+follow up project:
+https://github.com/docent666/qilin
+
 #  Team
 Mark Painter
 Lukasz Musial
